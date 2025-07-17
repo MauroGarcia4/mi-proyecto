@@ -16,22 +16,38 @@ function App() {
     return guardado ? JSON.parse(guardado) : [];
   });
 
-  const [titulos, setTitulos] = useState(titulosData);
-  const [jugadoresState, setJugadoresState] = useState(jugadores);
+  const [titulos, setTitulos] = useState(() => {
+    const guardado = localStorage.getItem('titulos');
+    return guardado ? JSON.parse(guardado) : titulosData;
+  });
 
-  const [busqueda, setBusqueda] = useState('');
-  const [titulosFiltrados, setTitulosFiltrados] = useState(titulosData);
+  const [jugadoresState, setJugadoresState] = useState(() => {
+    const guardado = localStorage.getItem('jugadores');
+    return guardado ? JSON.parse(guardado) : jugadores;
+  });
+
+  const [busquedaTitulo, setBusquedaTitulo] = useState('');
+  const [busquedaJugador, setBusquedaJugador] = useState('');
+
+  const titulosFiltrados = titulos.filter(titulo =>
+    titulo.torneo.toLowerCase().includes(busquedaTitulo.toLowerCase())
+  );
+
+  const jugadoresFiltrados = jugadoresState.filter(jugador =>
+    jugador.nombre.toLowerCase().includes(busquedaJugador.toLowerCase())
+  );
 
   useEffect(() => {
     localStorage.setItem('mensajes', JSON.stringify(mensajes));
   }, [mensajes]);
 
   useEffect(() => {
-    const resultado = titulos.filter(titulo =>
-      titulo.torneo.toLowerCase().includes(busqueda.toLowerCase())
-    );
-    setTitulosFiltrados(resultado);
-  }, [busqueda, titulos]);
+    localStorage.setItem('titulos', JSON.stringify(titulos));
+  }, [titulos]);
+
+  useEffect(() => {
+    localStorage.setItem('jugadores', JSON.stringify(jugadoresState));
+  }, [jugadoresState]);
 
   const agregarMensaje = (nuevo) => {
     setMensajes([...mensajes, nuevo]);
@@ -49,6 +65,22 @@ function App() {
     setMensajes(copia);
   };
 
+  const agregarTitulo = () => {
+    const nuevoTorneo = prompt('Nombre del torneo:');
+    if (!nuevoTorneo || nuevoTorneo.trim() === '') {
+      alert('El nombre del torneo no puede estar vacío.');
+      return;
+    }
+
+    const nuevoAnio = prompt('Año del torneo:');
+    if (!nuevoAnio || nuevoAnio.trim() === '') {
+      alert('El año no puede estar vacío.');
+      return;
+    }
+
+    setTitulos([...titulos, { torneo: nuevoTorneo.trim(), anio: nuevoAnio.trim() }]);
+  };
+
   const eliminarTitulo = (index) => {
     const copia = [...titulos];
     copia.splice(index, 1);
@@ -56,9 +88,35 @@ function App() {
   };
 
   const modificarTitulo = (index, nuevoTitulo) => {
+    if (
+      !nuevoTitulo.torneo ||
+      nuevoTitulo.torneo.trim() === '' ||
+      !nuevoTitulo.anio ||
+      nuevoTitulo.anio.trim() === ''
+    ) {
+      alert('El torneo y el año no pueden estar vacíos.');
+      return;
+    }
+
     const copia = [...titulos];
-    copia[index] = nuevoTitulo;
+    copia[index] = { torneo: nuevoTitulo.torneo.trim(), anio: nuevoTitulo.anio.trim() };
     setTitulos(copia);
+  };
+
+  const agregarJugador = () => {
+    const nuevoNombre = prompt('Nombre del jugador:');
+    if (!nuevoNombre || nuevoNombre.trim() === '') {
+      alert('El nombre del jugador no puede estar vacío.');
+      return;
+    }
+
+    const nuevaPosicion = prompt('Posición:');
+    if (!nuevaPosicion || nuevaPosicion.trim() === '') {
+      alert('La posición no puede estar vacía.');
+      return;
+    }
+
+    setJugadoresState([...jugadoresState, { nombre: nuevoNombre.trim(), posicion: nuevaPosicion.trim() }]);
   };
 
   const eliminarJugador = (index) => {
@@ -68,24 +126,34 @@ function App() {
   };
 
   const modificarJugador = (index, nuevoJugador) => {
+    if (
+      !nuevoJugador.nombre ||
+      nuevoJugador.nombre.trim() === '' ||
+      !nuevoJugador.posicion ||
+      nuevoJugador.posicion.trim() === ''
+    ) {
+      alert('El nombre y la posición no pueden estar vacíos.');
+      return;
+    }
+
     const copia = [...jugadoresState];
-    copia[index] = nuevoJugador;
+    copia[index] = { nombre: nuevoJugador.nombre.trim(), posicion: nuevoJugador.posicion.trim() };
     setJugadoresState(copia);
   };
 
   return (
     <div className="app">
       <Header />
-
       <section className="seccion">
         <h2>Títulos importantes</h2>
         <input
           type="text"
           placeholder="Buscar torneo..."
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
+          value={busquedaTitulo}
+          onChange={(e) => setBusquedaTitulo(e.target.value)}
           className="buscador"
         />
+        <button onClick={agregarTitulo}>Agregar Título</button>
         <div className="grid">
           {titulosFiltrados.map((titulo, i) => (
             <CardTitulo
@@ -101,8 +169,16 @@ function App() {
 
       <section className="seccion">
         <h2>Jugadores históricos</h2>
+        <input
+          type="text"
+          placeholder="Buscar jugador..."
+          value={busquedaJugador}
+          onChange={(e) => setBusquedaJugador(e.target.value)}
+          className="buscador"
+        />
+        <button onClick={agregarJugador}>Agregar Jugador</button>
         <div className="grid">
-          {jugadoresState.map((jugador, i) => (
+          {jugadoresFiltrados.map((jugador, i) => (
             <CardJugador
               key={i}
               jugador={jugador}
@@ -123,7 +199,6 @@ function App() {
           modificarMensaje={modificarMensaje}
         />
       </section>
-
       <Footer />
     </div>
   );
