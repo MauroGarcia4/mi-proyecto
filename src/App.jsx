@@ -78,6 +78,14 @@ function App() {
       return;
     }
 
+    for (let i = 0; i < nuevoAnio.length; i++) {
+      const c = nuevoAnio[i]
+      if (c < '0' || c > '9') {
+        alert('El año debe contener sólo números.')
+        return
+      }
+    }
+
     setTitulos([...titulos, { torneo: nuevoTorneo.trim(), anio: nuevoAnio.trim() }]);
   };
 
@@ -96,6 +104,14 @@ function App() {
     ) {
       alert('El torneo y el año no pueden estar vacíos.');
       return;
+    }
+
+    for (let i = 0; i < nuevoTitulo.anio.length; i++) {
+      const c = nuevoTitulo.anio[i]
+      if (c < '0' || c > '9') {
+        alert('El año debe contener sólo números.')
+        return
+      }
     }
 
     const copia = [...titulos];
