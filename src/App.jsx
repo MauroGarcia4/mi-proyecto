@@ -126,11 +126,35 @@ function App() {
       return;
     }
 
+    for (let i = 0; i < nuevoNombre.length; i++) {
+    const c = nuevoNombre[i];
+    if (
+      !( (c >= 'A' && c <= 'Z') ||
+         (c >= 'a' && c <= 'z') ||
+         c === ' ' )
+    ) {
+      alert('El nombre solo puede tener letras.');
+      return;
+    }
+    }
+
     const nuevaPosicion = prompt('Posición:');
     if (!nuevaPosicion || nuevaPosicion.trim() === '') {
       alert('La posición no puede estar vacía.');
       return;
     }
+
+    for (let i = 0; i < nuevaPosicion.length; i++) {
+    const c = nuevaPosicion[i];
+    if (
+      !( (c >= 'A' && c <= 'Z') ||
+         (c >= 'a' && c <= 'z') ||
+         c === ' ' )
+    ) {
+      alert('La posición solo puede tener letras.');
+      return;
+    }
+   }
 
     setJugadoresState([...jugadoresState, { nombre: nuevoNombre.trim(), posicion: nuevaPosicion.trim() }]);
   };
@@ -141,16 +165,42 @@ function App() {
     setJugadoresState(copia);
   };
 
-  const modificarJugador = (index, nuevoJugador) => {
+const modificarJugador = (index, nuevoJugador) => {
+  if (
+    !nuevoJugador.nombre ||
+    nuevoJugador.nombre.trim() === '' ||
+    !nuevoJugador.posicion ||
+    nuevoJugador.posicion.trim() === ''
+  ) {
+    alert('El nombre y la posición no pueden estar vacíos.');
+    return;
+  }
+
+  // Validar que el nombre solo tenga letras y espacios
+  for (let i = 0; i < nuevoJugador.nombre.length; i++) {
+    const c = nuevoJugador.nombre[i];
     if (
-      !nuevoJugador.nombre ||
-      nuevoJugador.nombre.trim() === '' ||
-      !nuevoJugador.posicion ||
-      nuevoJugador.posicion.trim() === ''
+      !( (c >= 'A' && c <= 'Z') ||
+         (c >= 'a' && c <= 'z') ||
+         c === ' ' )
     ) {
-      alert('El nombre y la posición no pueden estar vacíos.');
+      alert('El nombre solo puede tener letras.');
       return;
     }
+  }
+
+  // Validar que la posición solo tenga letras y espacios
+  for (let i = 0; i < nuevoJugador.posicion.length; i++) {
+    const c = nuevoJugador.posicion[i];
+    if (
+      !( (c >= 'A' && c <= 'Z') ||
+         (c >= 'a' && c <= 'z') ||
+         c === ' ' )
+    ) {
+      alert('La posición solo puede tener letras.');
+      return;
+    }
+   }
 
     const copia = [...jugadoresState];
     copia[index] = { nombre: nuevoJugador.nombre.trim(), posicion: nuevoJugador.posicion.trim() };
